@@ -1,0 +1,2 @@
+sql_instance,sqlwatch_database_name,environment,is_enabled
+sql-test-1\sql2016,SQLWATCH,TEST,TRUE
