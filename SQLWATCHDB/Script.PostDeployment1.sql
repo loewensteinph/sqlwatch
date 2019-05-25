@@ -10,6 +10,29 @@ Post-Deployment Script Template
 --------------------------------------------------------------------------------------
 */
 
+
+/* add local instance to server config so we can satify relations */
+merge dbo.sqlwatch_config_sql_instance as target
+using (select sql_instance = @@SERVERNAME) as source
+on target.sql_instance = source.sql_instance
+when not matched then
+	insert (sql_instance)
+	values (@@SERVERNAME);
+
+--/* start XE sessions */
+--declare @sqlstmt varchar(4000) = ''
+
+--select @sqlstmt = @sqlstmt + 'alter event session [' + es.name + '] on server state = start' + char(10) 
+--from sys.server_event_sessions es
+--left join sys.dm_xe_sessions xs ON xs.name = es.name
+--where es.name in ('--SQLWATCH_workload','SQLWATCH_waits','SQLWATCH_blockers') --not starting worklaod capture, leaving this to individuals to decide if they want to capture long queries
+--and xs.name is null
+
+--exec (@sqlstmt)
+
+
+
+
 if (select count(*) from [dbo].[sql_perf_mon_config_who_is_active_age]) = 0
 	begin
 		insert into [dbo].[sql_perf_mon_config_who_is_active_age]
@@ -24,20 +47,21 @@ versions of SQLWATCH and we will now update create_date to the actual
 create_date (this will only apply to upgrades) */
 update swd
 	set [database_create_date] = db.[create_date]
-from [dbo].[sql_perf_mon_database] swd
+from [dbo].[sqlwatch_meta_database] swd
 inner join sys.databases db
-	on db.[name] = swd.[database_name]
+	on db.[name] = swd.[database_name] collate database_default
 	and swd.[database_create_date] = '1970-01-01'
+	and swd.sql_instance = @@SERVERNAME
 
 /* now add new databases */
-exec [dbo].[sp_sql_perf_mon_add_database]
+exec [dbo].[usp_sqlwatch_internal_add_database]
 
 --------------------------------------------------------------------------------------
 --
 --------------------------------------------------------------------------------------
-if (select count(*) from [dbo].[sql_perf_mon_server]) = 0
+if (select count(*) from [dbo].[sqlwatch_meta_server]) = 0
 	begin
-		insert into dbo.sql_perf_mon_server 
+		insert into dbo.[sqlwatch_meta_server] 
 		select convert(sysname,SERVERPROPERTY('ComputerNamePhysicalNetBIOS'))
 			, convert(sysname,@@SERVERNAME), convert(sysname,@@SERVICENAME), convert(varchar(50),local_net_address), convert(varchar(50),local_tcp_port)
 		from sys.dm_exec_connections where session_id = @@spid
@@ -323,17 +347,19 @@ insert into #sql_perf_mon_config_perf_counters([collect],[object_name],[counter_
 		,(1,'Win32_PerfFormattedData_PerfOS_Processor','Idle Time %','SQL',NULL)
 		,(1,'Win32_PerfFormattedData_PerfOS_Processor','Processor Time %','System',NULL)
 
-insert into [dbo].[sql_perf_mon_config_perf_counters]
+insert into [dbo].[sqlwatch_config_performance_counters]
 select s.* from #sql_perf_mon_config_perf_counters s
-left join [dbo].[sql_perf_mon_config_perf_counters] t
-on s.[object_name] = t.[object_name]
-and s.[instance_name] = t.[instance_name]
-and s.[counter_name] = t.[counter_name]
+left join [dbo].[sqlwatch_config_performance_counters] t
+on s.[object_name] = t.[object_name] collate database_default
+and s.[instance_name] = t.[instance_name] collate database_default
+and s.[counter_name] = t.[counter_name] collate database_default
 where t.[counter_name] is null
 
 --------------------------------------------------------------------------------------
 --
 --------------------------------------------------------------------------------------
+
+--TODO: THIS HAS BEEN MOVED TO POWERBI AND CAN BE REMOVED FROM SQL PROJECT
 CREATE TABLE #sql_perf_mon_config_wait_stats
 (
 	[category_name] [nvarchar](40) not null,
@@ -616,7 +642,7 @@ create nonclustered index tmp_idx_wait_stats on #sql_perf_mon_config_wait_stats(
 insert into [dbo].[sql_perf_mon_config_wait_stats]
 select s.* from #sql_perf_mon_config_wait_stats s
 left join [dbo].[sql_perf_mon_config_wait_stats] t
-on s.wait_type = t.wait_type
+on s.wait_type = t.wait_type collate database_default
 where t.wait_type is null
 --------------------------------------------------------------------------------------
 --
@@ -632,7 +658,7 @@ if (select count(*) from [dbo].[sql_perf_mon_config_report_time_interval]) = 0
 --------------------------------------------------------------------------------------
 -- add snapshot types
 --------------------------------------------------------------------------------------
-;merge [dbo].[sql_perf_mon_config_snapshot_type] as target
+;merge [dbo].[sqlwatch_config_snapshot_type] as target
 using (
 	/* performance data logger */
 	select [snapshot_type_id] = 1, [snapshot_type_desc] = 'Performance', [snapshot_retention_days] = 7
@@ -641,10 +667,31 @@ using (
 	select [snapshot_type_id] = 2, [snapshot_type_desc] = 'Disk Utilisation', [snapshot_retention_days] = 365
 	union 
 	/* indexes */
-	select [snapshot_type_id] = 3, [snapshot_type_desc] = 'Index Advisor', [snapshot_retention_days] = 30
+	select [snapshot_type_id] = 3, [snapshot_type_desc] = 'Missing indexes', [snapshot_retention_days] = 30
 	union 
-	/* XE Health Session */
-	select [snapshot_type_id] = 6, [snapshot_type_desc] = 'XE-SH Waits', [snapshot_retention_days] = 3
+	/* XES Waits */
+	select [snapshot_type_id] = 6, [snapshot_type_desc] = 'XES Waits', [snapshot_retention_days] = 7
+	union
+	/* XES SQLWATCH Long queries */
+	select [snapshot_type_id] = 7, [snapshot_type_desc] = 'XES Long Queries', [snapshot_retention_days] = 7
+	union
+	/* XES SQLWATCH Waits */
+	select [snapshot_type_id] = 8, [snapshot_type_desc] = 'XES Waits', [snapshot_retention_days] = 30  --is this used
+	union
+	/* XES SQLWATCH Blockers */
+	select [snapshot_type_id] = 9, [snapshot_type_desc] = 'XES Blockers', [snapshot_retention_days] = 30
+	union
+	/* XES diagnostics */
+	select [snapshot_type_id] = 10, [snapshot_type_desc] = 'XES Query Processing', [snapshot_retention_days] = 30
+	union
+	/* whoisactive */
+	select [snapshot_type_id] = 11, [snapshot_type_desc] = 'WhoIsActive', [snapshot_retention_days] = 3
+	union
+	/* index usage */
+	select [snapshot_type_id] = 14, [snapshot_type_desc] = 'Index Stats', [snapshot_retention_days] = 90
+	union
+	/* index histogram */
+	select [snapshot_type_id] = 15, [snapshot_type_desc] = 'Index Histogram', [snapshot_retention_days] = 90
 
 ) as source
 on (source.[snapshot_type_id] = target.[snapshot_type_id])
@@ -659,269 +706,122 @@ when not matched then
 --
 --------------------------------------------------------------------------------------
 
+/* migrate snapshots 1.3.3 to 1.5 */
+--query processing has been split out into its own snapshot 10 from snapshot 1.
+--we have to backfill header first as there wont be any old records with id 10, it would violate fk reference
+--if we dont migrate, the old query processing records will not be available in dashboard.
+if (select count(*) from [dbo].[sqlwatch_logger_snapshot_header]
+	where [snapshot_type_id] = 10) = 0
+		begin
+			insert into [dbo].[sqlwatch_logger_snapshot_header]
+			select distinct s.[snapshot_time], [snapshot_type_id] = 10, @@SERVERNAME
+			from [dbo].[sqlwatch_logger_xes_query_processing] s
+				left join [dbo].[sqlwatch_logger_snapshot_header] t
+				on t.snapshot_time = s.snapshot_time
+				and t.snapshot_type_id = 1
+				and s.snapshot_type_id = 10
+				and s.sql_instance = t.sql_instance
+			where t.snapshot_time is null
+
+			update [dbo].[sqlwatch_logger_xes_query_processing]
+				set  [snapshot_type_id] = 10
+				where [snapshot_type_id] = 1
+				and sql_instance = @@SERVERNAME
+		end
+
+
+--------------------------------------------------------------------------------------
+--
+--------------------------------------------------------------------------------------
+
 
 --setup jobs
 --we have to switch database to msdb but we also need to know which db jobs should run in so have to capture current database:
 declare @server nvarchar(255)
 set @server = @@SERVERNAME
+
 USE [msdb]
-DECLARE @jobId BINARY(16)
-DECLARE @schedule_id int;
-if (select name from sysjobs where name = 'DBA-PERF-LOGGER') is null
+
+------------------------------------------------------------------------------------------------------------------
+-- job creator engine, March 2019
+------------------------------------------------------------------------------------------------------------------
+/* rename old jobs to new standard, DB 1.5, March 2019 */
+set nocount on;
+
+declare @sql varchar(max) = ''
+
+create table #jobrename (
+	old_job sysname, new_job sysname
+	)
+insert into #jobrename
+	values  ('DBA-PERF-AUTO-CONFIG',			'SQLWATCH-INTERNAL-CONFIG'),
+			('DBA-PERF-LOGGER',					'SQLWATCH-LOGGER-PERFORMANCE'),
+			('DBA-PERF-LOGGER-RETENTION',		'SQLWATCH-INTERNAL-RETENTION'),
+			('SQLWATCH-LOGGER-MISSING-INDEXES',	'SQLWATCH-LOGGER-INDEXES')
+
+select @sql = @sql + convert(varchar(max),' if (select name from msdb.dbo.sysjobs where name = ''' + old_job + ''') is not null
+	and (select name from msdb.dbo.sysjobs where name = ''' + new_job + ''') is null
 	begin
-		EXEC  msdb.dbo.sp_add_job @job_name=N'DBA-PERF-LOGGER', 
-				@enabled=1, 
-				@notify_level_eventlog=0, 
-				@notify_level_email=2, 
-				@notify_level_page=2, 
-				@delete_level=0, 
-				@category_name=N'Data Collector', 
-				@owner_login_name=N'sa', @job_id = @jobId OUTPUT;
-		EXEC msdb.dbo.sp_add_jobserver @job_name=N'DBA-PERF-LOGGER', @server_name = @server;
-		EXEC msdb.dbo.sp_add_jobstep @job_name=N'DBA-PERF-LOGGER', @step_name=N'DBA-PERF-LOGGER', 
-				@step_id=1, 
-				@cmdexec_success_code=0, 
-				@on_success_action=1, 
-				@on_fail_action=2, 
-				@retry_attempts=0, 
-				@retry_interval=0, 
-				@os_run_priority=0, @subsystem=N'TSQL', 
-				@command=N'exec [dbo].[sp_sql_perf_mon_logger]', 
-				@database_name='$(DatabaseName)', 
-				@flags=0;
-		EXEC msdb.dbo.sp_update_job @job_name=N'DBA-PERF-LOGGER', 
-				@enabled=1, 
-				@start_step_id=1, 
-				@notify_level_eventlog=0, 
-				@notify_level_email=2, 
-				@notify_level_page=2, 
-				@delete_level=0, 
-				@description=N'', 
-				@category_name=N'Data Collector', 
-				@owner_login_name=N'sa', 
-				@notify_email_operator_name=N'', 
-				@notify_page_operator_name=N'';
-		EXEC msdb.dbo.sp_add_jobschedule @job_name=N'DBA-PERF-LOGGER', @name=N'DBA-PERF-LOGGER', 
-				@enabled=1, 
-				@freq_type=4, 
-				@freq_interval=1, 
-				@freq_subday_type=4, 
-				@freq_subday_interval=1, 
-				@freq_relative_interval=0, 
-				@freq_recurrence_factor=1, 
-				@active_start_date=20180804, 
-				@active_end_date=99991231, 
-				@active_start_time=12, 
-				@active_end_time=235959, @schedule_id = @schedule_id OUTPUT;
-	end
-if (select name from sysjobs where name = 'DBA-PERF-LOGGER-RETENTION') is  null
-	begin
-		set @jobId = null
-		EXEC  msdb.dbo.sp_add_job @job_name=N'DBA-PERF-LOGGER-RETENTION', 
-				@enabled=1, 
-				@notify_level_eventlog=0, 
-				@notify_level_email=2, 
-				@notify_level_page=2, 
-				@delete_level=0, 
-				@category_name=N'Data Collector', 
-				@owner_login_name=N'sa', @job_id = @jobId OUTPUT;
-		EXEC msdb.dbo.sp_add_jobserver @job_name=N'DBA-PERF-LOGGER-RETENTION', @server_name = @server;
-		EXEC msdb.dbo.sp_add_jobstep @job_name=N'DBA-PERF-LOGGER-RETENTION', @step_name=N'DBA-PERF-LOGGER-RETENTION', 
-				@step_id=1, 
-				@cmdexec_success_code=0, 
-				@on_success_action=1, 
-				@on_fail_action=2, 
-				@retry_attempts=0, 
-				@retry_interval=0, 
-				@os_run_priority=0, @subsystem=N'TSQL', 
-				@command=N'exec dbo.sp_sql_perf_mon_retention', 
-				@database_name='$(DatabaseName)',
-				@flags=0;
-		EXEC msdb.dbo.sp_update_job @job_name=N'DBA-PERF-LOGGER-RETENTION', 
-				@enabled=1, 
-				@start_step_id=1, 
-				@notify_level_eventlog=0, 
-				@notify_level_email=2, 
-				@notify_level_page=2, 
-				@delete_level=0, 
-				@description=N'', 
-				@category_name=N'Data Collector', 
-				@owner_login_name=N'sa', 
-				@notify_email_operator_name=N'', 
-				@notify_page_operator_name=N'';
-		set @schedule_id = null
-		EXEC msdb.dbo.sp_add_jobschedule @job_name=N'DBA-PERF-LOGGER-RETENTION', @name=N'DBA-PERF-LOGGER-RETENTION', 
-				@enabled=1, 
-				@freq_type=4, 
-				@freq_interval=1, 
-				@freq_subday_type=8, 
-				@freq_subday_interval=1, 
-				@freq_relative_interval=0, 
-				@freq_recurrence_factor=1, 
-				@active_start_date=20180804, 
-				@active_end_date=99991231, 
-				@active_start_time=20, 
-				@active_end_time=235959, @schedule_id = @schedule_id OUTPUT
-	end
+		exec msdb.dbo.sp_update_job @job_name=N''' + old_job + ''', @new_name=N''' + new_job + '''
+	end;')
+from #jobrename
 
-if (select name from sysjobs where name = 'DBA-PERF-AUTO-CONFIG') is  null
-	begin
-	set @jobId = null
-	EXEC  msdb.dbo.sp_add_job @job_name=N'DBA-PERF-AUTO-CONFIG', 
-			@enabled=1, 
-			@notify_level_eventlog=0, 
-			@notify_level_email=2, 
-			@notify_level_page=2, 
-			@delete_level=0, 
-			@category_name=N'Data Collector', 
-			@owner_login_name=N'sa', @job_id = @jobId OUTPUT
-	EXEC msdb.dbo.sp_add_jobserver @job_name=N'DBA-PERF-AUTO-CONFIG', @server_name = @server
-	EXEC msdb.dbo.sp_add_jobstep @job_name=N'DBA-PERF-AUTO-CONFIG', @step_name=N'ADD-DATABASE', 
-			@step_id=1, 
-			@cmdexec_success_code=0, 
-			@on_success_action=1, 
-			@on_fail_action=2, 
-			@retry_attempts=0, 
-			@retry_interval=0, 
-			@os_run_priority=0, @subsystem=N'TSQL', 
-			@command=N'EXEC dbo.sp_sql_perf_mon_add_database', 
-			@database_name='$(DatabaseName)', 
-			@flags=0
+exec ( @sql )
 
-	EXEC msdb.dbo.sp_update_job @job_name=N'DBA-PERF-AUTO-CONFIG', 
-			@enabled=1, 
-			@start_step_id=1, 
-			@notify_level_eventlog=0, 
-			@notify_level_email=2, 
-			@notify_level_page=2, 
-			@delete_level=0, 
-			@description=N'', 
-			@category_name=N'Data Collector', 
-			@owner_login_name=N'sa', 
-			@notify_email_operator_name=N'', 
-			@notify_page_operator_name=N''
-
-	set @schedule_id = null
-	EXEC msdb.dbo.sp_add_jobschedule @job_name=N'DBA-PERF-AUTO-CONFIG', @name=N'DBA-PERF-AUTO-CONFIG', 
-			@enabled=1, 
-			@freq_type=4, 
-			@freq_interval=1, 
-			@freq_subday_type=8, 
-			@freq_subday_interval=1, 
-			@freq_relative_interval=0, 
-			@freq_recurrence_factor=1, 
-			@active_start_date=20180828, 
-			@active_end_date=99991231, 
-			@active_start_time=26, 
-			@active_end_time=235959, @schedule_id = @schedule_id OUTPUT
-	select @schedule_id
-end
-
-if (select name from sysjobs where name = 'SQLWATCH-LOGGER-MISSING-INDEXES') is null
-	begin
-		set @jobId = null
-		EXEC msdb.dbo.sp_add_job @job_name=N'SQLWATCH-LOGGER-MISSING-INDEXES', 
-				@enabled=1, 
-				@notify_level_eventlog=0, 
-				@notify_level_email=0, 
-				@notify_level_netsend=0, 
-				@notify_level_page=0, 
-				@delete_level=0, 
-				@description=N'https://sqlwatch.io', 
-				@category_name=N'Data Collector', 
-				@owner_login_name=N'sa', @job_id = @jobId OUTPUT
-
-		EXEC msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'dbo.usp_logger_missing_indexes', 
-				@step_id=1, 
-				@cmdexec_success_code=0, 
-				@on_success_action=1, 
-				@on_success_step_id=0, 
-				@on_fail_action=2, 
-				@on_fail_step_id=0, 
-				@retry_attempts=0, 
-				@retry_interval=0, 
-				@os_run_priority=0, @subsystem=N'TSQL', 
-				@command=N'exec [dbo].[usp_logger_missing_indexes]', 
-				@database_name='$(DatabaseName)', 
-				@flags=0
-
-		EXEC msdb.dbo.sp_update_job @job_id = @jobId, @start_step_id = 1
-		
-		set @schedule_id = null
-
-		EXEC msdb.dbo.sp_add_jobschedule @job_id=@jobId, @name=N'SQLWATCH-LOGGER-MISSING-INDEXES', 
-				@enabled=1, 
-				@freq_type=8, 
-				@freq_interval=64, 
-				@freq_subday_type=1, 
-				@freq_subday_interval=1, 
-				@freq_relative_interval=0, 
-				@freq_recurrence_factor=1, 
-				@active_start_date=20180919, 
-				@active_end_date=99991231, 
-				@active_start_time=60000, 
-				@active_end_time=235959, 
-				@schedule_id = @schedule_id OUTPUT
-
-		EXEC msdb.dbo.sp_add_jobserver @job_id = @jobId, @server_name = N'(local)'
-	end
-
-if (select name from sysjobs where name = 'SQLWATCH-LOGGER-DISK-UTILISATION') is  null
-	begin
-		set @jobId = null
-		EXEC  msdb.dbo.sp_add_job @job_name=N'SQLWATCH-LOGGER-DISK-UTILISATION', 
-					@enabled=1, 
-					@notify_level_eventlog=0, 
-					@notify_level_email=2, 
-					@notify_level_page=2, 
-					@delete_level=0, 
-					@category_name=N'Data Collector', 
-					@owner_login_name=N'sa', @job_id = @jobId OUTPUT
-		EXEC msdb.dbo.sp_add_jobserver @job_name=N'SQLWATCH-LOGGER-DISK-UTILISATION', @server_name = @server;
-		EXEC msdb.dbo.sp_add_jobstep @job_name=N'SQLWATCH-LOGGER-DISK-UTILISATION', @step_name=N'exec dbo.usp_logger_disk_utilisation', 
-			@step_id=1, 
-			@cmdexec_success_code=0, 
-			@on_success_action=1, 
-			@on_fail_action=2, 
-			@retry_attempts=0, 
-			@retry_interval=0, 
-			@os_run_priority=0, @subsystem=N'TSQL', 
-			@command=N'exec [dbo].[usp_logger_disk_utilisation]', 
-			@database_name='$(DatabaseName)', 
-			@flags=0
-		
-		EXEC msdb.dbo.sp_update_job @job_name=N'SQLWATCH-LOGGER-DISK-UTILISATION', 
-				@enabled=1, 
-				@start_step_id=1, 
-				@notify_level_eventlog=0, 
-				@notify_level_email=2, 
-				@notify_level_page=2, 
-				@delete_level=0, 
-				@description=N'', 
-				@category_name=N'Data Collector', 
-				@owner_login_name=N'sa', 
-				@notify_email_operator_name=N'', 
-				@notify_page_operator_name=N''
-		set @schedule_id = null
-		EXEC msdb.dbo.sp_add_jobschedule @job_name=N'SQLWATCH-LOGGER-DISK-UTILISATION', @name=N'SQLWATCH-LOGGER-DISK-UTILISATION', 
-				@enabled=1, 
-				@freq_type=4, 
-				@freq_interval=1, 
-				@freq_subday_type=8, 
-				@freq_subday_interval=1, 
-				@freq_relative_interval=0, 
-				@freq_recurrence_factor=1, 
-				@active_start_date=20180909, 
-				@active_end_date=99991231, 
-				@active_start_time=437, 
-				@active_end_time=235959, @schedule_id = @schedule_id OUTPUT
-	end
-
-set @jobId = null
+/* create jobs */
+declare @job_description nvarchar(255) = 'https://sqlwatch.io'
+declare @job_category nvarchar(255) = 'Data Collector'
+declare @database_name sysname = '$(DatabaseName)'
 declare @command nvarchar(4000)
-set @command = N'
-[datetime]$snapshot_time = (Invoke-SqlCmd -ServerInstance "' + @server + '" -Database ' + '$(DatabaseName)' + ' -Query "select [snapshot_time]=max([snapshot_time]) 
-from [dbo].[sql_perf_mon_snapshot_header]
+
+set @sql = ''
+create table #jobs (
+	job_name sysname primary key,
+	freq_type int, 
+	freq_interval int, 
+	freq_subday_type int, 
+	freq_subday_interval int, 
+	freq_relative_interval int, 
+	freq_recurrence_factor int, 
+	active_start_date int, 
+	active_end_date int, 
+	active_start_time int, 
+	active_end_time int,
+	job_enabled tinyint,
+	)
+
+create table #steps (
+	step_name sysname,
+	step_id int,
+	job_name sysname,
+	step_subsystem sysname,
+	step_command varchar(max)
+	)
+
+
+/* job definition */
+insert into #jobs
+	values	('SQLWATCH-LOGGER-WHOISACTIVE',		4, 1, 2, 15, 0, 0, 20180101, 99991231, 0,	235959, 0),
+			('SQLWATCH-LOGGER-PERFORMANCE',		4, 1, 4, 1,  0, 1, 20180101, 99991231, 12,	235959, 1),
+			('SQLWATCH-INTERNAL-RETENTION',		4, 1, 8, 1,  0, 1, 20180101, 99991231, 20,	235959, 1),
+			('SQLWATCH-LOGGER-DISK-UTILISATION',4, 1, 8, 1,  0, 1, 20180101, 99991231, 437,	235959, 1),
+			('SQLWATCH-LOGGER-INDEXES',			4, 1, 8, 6,  0, 1, 20180101, 99991231, 420,	235959, 1),
+			('SQLWATCH-INTERNAL-CONFIG',		4, 1, 8, 1,  0, 1, 20180101, 99991231, 26,  235959, 1)			
+
+/* step definition */
+insert into #steps
+	values	('dbo.usp_sqlwatch_logger_whoisactive',		1, 'SQLWATCH-LOGGER-WHOISACTIVE',		'TSQL', 'exec dbo.usp_sqlwatch_logger_whoisactive'),
+
+			('dbo.usp_sqlwatch_logger_performance',		1, 'SQLWATCH-LOGGER-PERFORMANCE',		'TSQL', 'exec dbo.usp_sqlwatch_logger_performance'),
+			('dbo.usp_sqlwatch_logger_xes_waits',		2, 'SQLWATCH-LOGGER-PERFORMANCE',		'TSQL', 'exec dbo.usp_sqlwatch_logger_xes_waits'),
+			('dbo.usp_sqlwatch_logger_xes_blockers',	3, 'SQLWATCH-LOGGER-PERFORMANCE',		'TSQL', 'exec dbo.usp_sqlwatch_logger_xes_blockers'),
+			('dbo.usp_sqlwatch_logger_xes_diagnostics',	4, 'SQLWATCH-LOGGER-PERFORMANCE',		'TSQL', 'exec dbo.usp_sqlwatch_logger_xes_diagnostics'),
+
+			('dbo.usp_sqlwatch_internal_retention',		1, 'SQLWATCH-INTERNAL-RETENTION',		'TSQL', 'exec dbo.usp_sqlwatch_internal_retention'),
+
+			('dbo.usp_sqlwatch_logger_disk_utilisation',1, 'SQLWATCH-LOGGER-DISK-UTILISATION',	'TSQL', 'exec dbo.usp_sqlwatch_logger_disk_utilisation'),
+			('Get-WMIObject Win32_Volume',		2, 'SQLWATCH-LOGGER-DISK-UTILISATION',	'PowerShell', N'[datetime]$snapshot_time = (Invoke-SqlCmd -ServerInstance "' + @server + '" -Database ' + '$(DatabaseName)' + ' -Query "select [snapshot_time]=max([snapshot_time]) 
+from [dbo].[sqlwatch_logger_snapshot_header]
 where snapshot_type_id = 2").snapshot_time
 
 #https://msdn.microsoft.com/en-us/library/aa394515(v=vs.85).aspx
@@ -935,7 +835,7 @@ Get-WMIObject Win32_Volume | ?{$_.DriveType -eq 3} | %{
     $Capacity = $_.Capacity
     $SnapshotTime = Get-Date $snapshot_time -format "yyyy-MM-dd HH:mm:ss.fff"
     Invoke-SqlCmd -ServerInstance "' + @server + '" -Database ' + '$(DatabaseName)' + ' -Query "
-     insert into [dbo].[logger_disk_utilisation_volume](
+     insert into [dbo].[sqlwatch_logger_disk_utilisation_volume](
             [volume_name]
            ,[volume_label]
            ,[volume_fs]
@@ -946,25 +846,35 @@ Get-WMIObject Win32_Volume | ?{$_.DriveType -eq 3} | %{
            ,[snapshot_time])
     values (''$VolumeName'',''$VolumeLabel'',''$FileSystem'',$BlockSize,$FreeSpace,$Capacity,2,''$SnapshotTime'')
     " 
-}'
-select @jobId = job_id from msdb.dbo.sysjobs where name = 'SQLWATCH-LOGGER-DISK-UTILISATION'
-if (select step_name from msdb.dbo.sysjobsteps
-where job_id = @jobId and step_name = 'Get-WMIObject Win32_Volume') is null
-	begin
-		EXEC msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Get-WMIObject Win32_Volume', 
-			@step_id=2, 
-			@cmdexec_success_code=0, 
-			@on_success_action=1, 
-			@on_success_step_id=0, 
-			@on_fail_action=2, 
-			@on_fail_step_id=0, 
-			@retry_attempts=0, 
-			@retry_interval=0, 
-			@os_run_priority=0, @subsystem=N'PowerShell', 
-			@command=@command, 
-		@database_name='$(DatabaseName)', 
-		@flags=0
-		EXEC msdb.dbo.sp_update_job @job_id = @jobId, @start_step_id = 1
-	end
-		EXEC msdb.dbo.sp_update_jobstep @job_id=@jobId, @step_id=1 ,@on_success_action=3
+}'),
+			('dbo.usp_sqlwatch_logger_missing_indexes',		1, 'SQLWATCH-LOGGER-INDEXES',		'TSQL', 'exec dbo.usp_sqlwatch_logger_missing_indexes'),
+			('dbo.usp_sqlwatch_logger_index_usage_stats',	2, 'SQLWATCH-LOGGER-INDEXES',		'TSQL', 'exec dbo.usp_sqlwatch_logger_index_usage_stats'),
+			('dbo.usp_sqlwatch_internal_add_database',	1, 'SQLWATCH-INTERNAL-CONFIG',		'TSQL', 'exec dbo.usp_sqlwatch_internal_add_database')
 
+
+/* create job and steps */
+select @sql = replace(replace(convert(nvarchar(max),(select ' if (select name from sysjobs where name = ''' + job_name + ''') is null 
+	begin
+		exec msdb.dbo.sp_add_job @job_name=N''' + job_name + ''',  @category_name=N''' + @job_category + ''', @enabled=' + convert(char(1),job_enabled) + ',@description=''' + @job_description + ''';
+		exec msdb.dbo.sp_add_jobserver @job_name=N''' + job_name + ''', @server_name = ''' + @server + ''';
+		' + (select 
+				' exec msdb.dbo.sp_add_jobstep @job_name=N''' + job_name + ''', @step_name=N''' + step_name + ''',@step_id= ' + convert(varchar(10),step_id) + ',@subsystem=N''' + step_subsystem + ''',@command=''' + replace(step_command,'''','''''') + ''',@on_success_action=' + case when ROW_NUMBER() over (partition by job_name order by step_id desc) = 1 then '1' else '3' end +', @on_fail_action=' + case when ROW_NUMBER() over (partition by job_name order by step_id desc) = 1 then '2' else '3' end + ', @database_name=''' + @database_name + ''''
+
+			 from #steps 
+			 where #steps.job_name = #jobs.job_name 
+			 order by step_id asc
+			 for xml path ('')) + '
+		exec msdb.dbo.sp_update_job @job_name=N''' + job_name + ''', @start_step_id=1
+		exec msdb.dbo.sp_add_jobschedule @job_name=N''' + job_name + ''', @name=N''' + job_name + ''', @enabled=1,@freq_type=' + convert(varchar(10),freq_type) + ',@freq_interval=' + convert(varchar(10),freq_interval) + ',@freq_subday_type=' + convert(varchar(10),freq_subday_type) + ',@freq_subday_interval=' + convert(varchar(10),freq_subday_interval) + ',@freq_relative_interval=' + convert(varchar(10),freq_relative_interval) + ',@freq_recurrence_factor=' + convert(varchar(10),freq_recurrence_factor) + ',@active_start_date=' + convert(varchar(10),active_start_date) + ',@active_end_date=' + convert(varchar(10),active_end_date) + ',@active_start_time=' + convert(varchar(10),active_start_time) + ',@active_end_time=' + convert(varchar(10),active_end_time) + ';
+		Print ''Job ''''' + job_name + ''''' created.''
+	end
+else
+	begin
+		Print ''Job ''''' + job_name + ''''' not created becuase it already exists.''
+	end;'
+	from #jobs
+	for xml path ('')
+)),'&#x0D;',''),'&amp;#x0D;','')
+
+print @sql
+exec (@sql)

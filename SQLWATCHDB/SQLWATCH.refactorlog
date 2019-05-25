@@ -84,4 +84,326 @@
     <Property Name="ParentElementType" Value="SqlSchema" />
     <Property Name="NewName" Value="[logger_perf_xes_query_processing]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="c8d37c63-fc15-41d0-a370-05c872a79177" ChangeDateTime="02/17/2019 19:34:55">
+    <Property Name="ElementName" Value="[dbo].[logger_perf_xes_waits].[query]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[logger_perf_xes_waits]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[sql_text]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="97f9912a-dc67-44d0-a8ef-3f166faa3fbf" ChangeDateTime="02/18/2019 00:54:26">
+    <Property Name="ElementName" Value="[dbo].[usp_logger_xes_long_queries]" />
+    <Property Name="ElementType" Value="SqlProcedure" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[usp_logger_xes_workload]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="a7ef6a3a-3c29-4caa-9795-ea877453ba19" ChangeDateTime="02/20/2019 02:24:53">
+    <Property Name="ElementName" Value="[dbo].[logger_perf_xes_blockers].[database name]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[logger_perf_xes_blockers]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[database_name]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="00e94e4f-b30c-4a63-9085-6c5b451a9ddc" ChangeDateTime="02/20/2019 02:25:06">
+    <Property Name="ElementName" Value="[dbo].[logger_perf_xes_blockers].[blocking_client app name]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[logger_perf_xes_blockers]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[blocking_client_app_name]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="033db253-7794-43d1-8b0c-b70b8ca1da18" ChangeDateTime="02/20/2019 02:25:19">
+    <Property Name="ElementName" Value="[dbo].[logger_perf_xes_blockers].[blocking_client hostname]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[logger_perf_xes_blockers]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[blocking_client_hostname]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="811ca778-e291-40bb-a55d-b04db3f3c080" ChangeDateTime="02/24/2019 21:13:16">
+    <Property Name="ElementName" Value="[dbo].[usp_logger_xes_workload]" />
+    <Property Name="ElementType" Value="SqlProcedure" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[usp_logger_xes_long_queries]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="bd12f7b7-ba22-4540-a29d-752146bd3c93" ChangeDateTime="03/03/2019 18:33:50">
+    <Property Name="ElementName" Value="[dbo].[logger_index_usage_stats].[index_enabled]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[logger_index_usage_stats]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[index_disabled]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="77b18ab0-dd95-4799-9b50-7de8555576eb" ChangeDateTime="04/07/2019 22:51:15">
+    <Property Name="ElementName" Value="[dbo].[sp_sql_perf_mon_add_database]" />
+    <Property Name="ElementType" Value="SqlProcedure" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[usp_sqlwatch_internal_add_database]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="587d458f-578d-44bb-9706-e40c3130a5c3" ChangeDateTime="04/07/2019 22:56:56">
+    <Property Name="ElementName" Value="[dbo].[sp_sql_perf_mon_logger]" />
+    <Property Name="ElementType" Value="SqlProcedure" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[usp_sqlwatch_logger_performance]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6d255325-20e1-49af-92d9-6e987c7254c2" ChangeDateTime="04/07/2019 23:00:00">
+    <Property Name="ElementName" Value="[dbo].[sp_sql_perf_mon_retention]" />
+    <Property Name="ElementType" Value="SqlProcedure" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[usp_sqlwatch_internal_retention]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="debe43cc-b42a-4a9d-9f21-206a41b1cbfa" ChangeDateTime="04/07/2019 23:02:36">
+    <Property Name="ElementName" Value="[dbo].[usp_logger_disk_utilisation]" />
+    <Property Name="ElementType" Value="SqlProcedure" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[usp_sqlwatch_logger_disk_utilisation]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c59f16b7-c8ce-448d-8632-09db4fc4275b" ChangeDateTime="04/07/2019 23:04:39">
+    <Property Name="ElementName" Value="[dbo].[usp_logger_index_usage_stats]" />
+    <Property Name="ElementType" Value="SqlProcedure" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[usp_sqlwatch_logger_index_usage_stats]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="21f43525-59fe-4612-9abf-58ee4e2ecea6" ChangeDateTime="04/07/2019 23:07:05">
+    <Property Name="ElementName" Value="[dbo].[usp_logger_missing_indexes]" />
+    <Property Name="ElementType" Value="SqlProcedure" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[usp_sqlwatch_logger_missing_indexes]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c3e5d5e0-1137-4eef-8fea-d2f26a16ad5c" ChangeDateTime="04/07/2019 23:18:14">
+    <Property Name="ElementName" Value="[dbo].[usp_logger_whoisactive]" />
+    <Property Name="ElementType" Value="SqlProcedure" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[usp_sqlwatch_logger_whoisactive]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f61ed5c2-2198-4966-ba08-8c9cdb76adcb" ChangeDateTime="04/07/2019 23:21:28">
+    <Property Name="ElementName" Value="[dbo].[usp_logger_xes_blockers]" />
+    <Property Name="ElementType" Value="SqlProcedure" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[usp_sqlwatch_logger_xes_blockers]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="fb5dd51d-9abd-47d8-b1c2-34266ad908f9" ChangeDateTime="04/07/2019 23:23:35">
+    <Property Name="ElementName" Value="[dbo].[usp_logger_xes_diagnostics]" />
+    <Property Name="ElementType" Value="SqlProcedure" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[usp_sqlwatch_logger_xes_diagnostics]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="88826941-ceb7-409d-830b-5525a864205c" ChangeDateTime="04/07/2019 23:25:52">
+    <Property Name="ElementName" Value="[dbo].[usp_logger_xes_waits]" />
+    <Property Name="ElementType" Value="SqlProcedure" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[usp_sqlwatch_logger_xes_waits]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="96bb2098-a598-4567-8284-c4604165f470" ChangeDateTime="04/07/2019 23:28:11">
+    <Property Name="ElementName" Value="[dbo].[usp_logger_xes_long_queries]" />
+    <Property Name="ElementType" Value="SqlProcedure" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[usp_sqlwatch_logger_xes_long_queries]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="0eb263ad-06f7-4291-b130-c0d40ea033fd" ChangeDateTime="04/07/2019 23:32:55">
+    <Property Name="ElementName" Value="[dbo].[ufn_get_product_version]" />
+    <Property Name="ElementType" Value="SqlScalarFunction" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[ufn_sqlwatch_get_product_version]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c805c4ac-5963-40fd-866b-b6d60bd8a091" ChangeDateTime="04/07/2019 23:34:37">
+    <Property Name="ElementName" Value="[dbo].[ufn_get_xes_target_file]" />
+    <Property Name="ElementType" Value="SqlScalarFunction" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[ufn_sqlwatch_get_xes_target_file]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="654a21c7-8ea4-41d0-a769-9d89d8eebc04" ChangeDateTime="04/07/2019 23:36:36">
+    <Property Name="ElementName" Value="[dbo].[ufn_time_intervals]" />
+    <Property Name="ElementType" Value="SqlInlineTableValuedFunction" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[ufn_sqlwatch_time_intervals]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="81cab51e-9f0c-40b1-8076-07cf8b77f7d0" ChangeDateTime="04/07/2019 23:44:49">
+    <Property Name="ElementName" Value="[dbo].[logger_disk_utilisation_database]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_disk_utilisation_database]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="59df7464-979b-4b71-bea9-0ed5289a8525" ChangeDateTime="04/07/2019 23:47:00">
+    <Property Name="ElementName" Value="[dbo].[logger_disk_utilisation_volume]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_disk_utilisation_volume]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d4914609-4df0-4374-8576-14cfae42149f" ChangeDateTime="04/07/2019 23:50:37">
+    <Property Name="ElementName" Value="[dbo].[logger_index_stats_histogram]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_index_stats_histogram]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="da4eb052-713e-453b-92a4-e0854cff81c3" ChangeDateTime="04/07/2019 23:52:47">
+    <Property Name="ElementName" Value="[dbo].[logger_index_usage_stats]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_index_usage_stats]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f622bb2e-65ae-49a4-85d0-709a9b7f506b" ChangeDateTime="04/07/2019 23:54:51">
+    <Property Name="ElementName" Value="[dbo].[logger_missing_indexes]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_missing_indexes]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="bc01eff0-383a-4817-bf36-2393912c76bd" ChangeDateTime="04/07/2019 23:56:44">
+    <Property Name="ElementName" Value="[dbo].[logger_perf_os_schedulers]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_perf_os_schedulers]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f4a7b935-9838-49c6-9bc1-ddb219abc201" ChangeDateTime="04/08/2019 00:00:23">
+    <Property Name="ElementName" Value="[dbo].[sqlwatch_logger_index_stats_histogram]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_index_usage_stats_histogram]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d56955cf-d1be-4fe0-8341-37f3141ea420" ChangeDateTime="04/08/2019 00:02:23">
+    <Property Name="ElementName" Value="[dbo].[sqlwatch_logger_missing_indexes]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_index_missing]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="4932bf6b-1cd3-4f6f-96ba-1fe51cf22ef0" ChangeDateTime="04/08/2019 00:04:41">
+    <Property Name="ElementName" Value="[dbo].[logger_perf_xes_blockers]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_xes_blockers]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="27a5d88c-53df-4127-a5e5-9b53db37bc56" ChangeDateTime="04/08/2019 00:08:07">
+    <Property Name="ElementName" Value="[dbo].[logger_perf_xes_iosubsystem]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_xes_iosubsystem]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="3565a781-8626-4f95-a1e7-2205557c0520" ChangeDateTime="04/08/2019 00:10:00">
+    <Property Name="ElementName" Value="[dbo].[logger_perf_xes_long_queries]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_xes_long_queries]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="30bd17a6-56ee-434b-a51b-224a572fc326" ChangeDateTime="04/08/2019 00:11:31">
+    <Property Name="ElementName" Value="[dbo].[logger_perf_xes_query_processing]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_xes_query_processing]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="1a8bcd08-5941-4e8f-b1b1-196d3ffa16ed" ChangeDateTime="04/08/2019 00:13:29">
+    <Property Name="ElementName" Value="[dbo].[logger_perf_xes_waits]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_xes_waits_stats]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="b90dc65d-820d-479d-adf4-34f422421a9e" ChangeDateTime="04/08/2019 00:15:50">
+    <Property Name="ElementName" Value="[dbo].[sql_perf_mon_config_perf_counters]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_config_performance_counters]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="992fe996-e467-4ec9-80a0-9bc1e3978ad9" ChangeDateTime="04/08/2019 00:17:38">
+    <Property Name="ElementName" Value="[dbo].[sql_perf_mon_config_snapshot_type]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_config_snapshot_type]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c69945b6-93f5-4efa-a858-fee45869a09e" ChangeDateTime="04/08/2019 00:20:38">
+    <Property Name="ElementName" Value="[dbo].[sql_perf_mon_database]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_meta_database]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6e8114b1-c274-4805-8742-739222708243" ChangeDateTime="04/08/2019 00:23:19">
+    <Property Name="ElementName" Value="[dbo].[sql_perf_mon_file_stats]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_perf_file_stats]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="4f994abe-9d18-46f5-9006-19a8fca11710" ChangeDateTime="04/08/2019 00:25:22">
+    <Property Name="ElementName" Value="[dbo].[sql_perf_mon_master_files]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_perf_master_files]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d71803ff-921c-4b51-8909-00843ea8eb58" ChangeDateTime="04/08/2019 00:27:03">
+    <Property Name="ElementName" Value="[dbo].[sql_perf_mon_os_memory_clerks]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_perf_os_memory_clerks]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c64b5b40-a9ca-4873-8d07-dc527ce43556" ChangeDateTime="04/08/2019 00:28:51">
+    <Property Name="ElementName" Value="[dbo].[sql_perf_mon_os_process_memory]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_perf_os_process_memory]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="7767e32c-9292-4e25-84ef-24b4c79b90a0" ChangeDateTime="04/08/2019 00:31:23">
+    <Property Name="ElementName" Value="[dbo].[sql_perf_mon_perf_counters]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_perf_os_performance_counters]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6f8f369e-fc2b-4de2-9b61-a89624c21d14" ChangeDateTime="04/08/2019 00:33:56">
+    <Property Name="ElementName" Value="[dbo].[sql_perf_mon_server]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_meta_server]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="3ab3177d-0bca-47fc-aa3b-9f3770e52e71" ChangeDateTime="04/08/2019 00:36:32">
+    <Property Name="ElementName" Value="[dbo].[sql_perf_mon_snapshot_header]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_snapshot_header]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="ef23606a-1819-43ca-a255-fddabf2c05f6" ChangeDateTime="04/08/2019 00:39:10">
+    <Property Name="ElementName" Value="[dbo].[sql_perf_mon_wait_stats]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_perf_os_wait_stats]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2ed1709b-b80e-4186-9ff2-43dab49075e9" ChangeDateTime="04/08/2019 00:42:16">
+    <Property Name="ElementName" Value="[dbo].[sql_perf_mon_who_is_active]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[sqlwatch_logger_whoisactive]" />
+  </Operation>
 </Operations>

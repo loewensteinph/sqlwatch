@@ -8,13 +8,13 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
     <ProjectGuid>{dfac46ef-72eb-4a88-96ab-f7d1a96e9e1c}</ProjectGuid>
-    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql100DatabaseSchemaProvider</DSP>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql110DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
     <RootNamespace>SQLWATCHDB</RootNamespace>
     <AssemblyName>SQLWATCHDB</AssemblyName>
-    <ModelCollation>1033, CI</ModelCollation>
+    <ModelCollation>1033,CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
@@ -29,7 +29,8 @@
     <PageVerify>CHECKSUM</PageVerify>
     <AllowSnapshotIsolation>True</AllowSnapshotIsolation>
     <ReadCommittedSnapshot>True</ReadCommittedSnapshot>
-    <DacVersion>1.3.0.0</DacVersion>
+    <DacVersion>1.6.0.0</DacVersion>
+    <DefaultCollation>Latin1_General_CI_AS</DefaultCollation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -69,55 +70,62 @@
     <Folder Include="dbo\Tables" />
     <Folder Include="dbo\Views" />
     <Folder Include="dbo\Procedures" />
+    <Folder Include="dbo\Extended Events" />
+    <Folder Include="dbo\Functions" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="dbo\Tables\sql_perf_mon_snapshot_header.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_snapshot_header.sql" />
     <Build Include="dbo\Tables\sql_perf_mon_config_who_is_active_age.sql" />
-    <Build Include="dbo\Tables\sql_perf_mon_database.sql" />
-    <Build Include="dbo\Tables\sql_perf_mon_server.sql" />
-    <Build Include="dbo\Tables\sql_perf_mon_file_stats.sql" />
-    <Build Include="dbo\Tables\sql_perf_mon_os_memory_clerks.sql" />
-    <Build Include="dbo\Tables\sql_perf_mon_wait_stats.sql" />
-    <Build Include="dbo\Tables\sql_perf_mon_perf_counters.sql" />
-    <Build Include="dbo\Tables\sql_perf_mon_who_is_active.sql" />
+    <Build Include="dbo\Tables\sqlwatch_meta_database.sql" />
+    <Build Include="dbo\Tables\sqlwatch_meta_server.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_perf_file_stats.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_perf_os_memory_clerks.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_perf_os_wait_stats.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_perf_os_performance_counters.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_whoisactive.sql" />
     <Build Include="dbo\Tables\sql_perf_mon_who_is_active_tmp.sql" />
-    <Build Include="dbo\Tables\sql_perf_mon_config_perf_counters.sql" />
+    <Build Include="dbo\Tables\sqlwatch_config_performance_counters.sql" />
     <Build Include="dbo\Tables\sql_perf_mon_config_wait_stats.sql" />
     <Build Include="dbo\Tables\sql_perf_mon_config_report_time_interval.sql" />
     <Build Include="dbo\Views\vw_sql_perf_mon_time_intervals.sql" />
     <Build Include="dbo\Views\vw_sql_perf_mon_wait_stats_categorised.sql" />
-    <Build Include="dbo\Tables\sql_perf_mon_os_process_memory.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_perf_os_process_memory.sql" />
     <Build Include="dbo\Views\vw_sql_perf_mon_rep_mem_proc.sql" />
     <Build Include="dbo\Views\vw_sql_perf_mon_rep_perf_counter.sql" />
-    <Build Include="dbo\Procedures\sp_sql_perf_mon_logger.sql" />
-    <Build Include="dbo\Procedures\sp_sql_perf_mon_retention.sql" />
-    <Build Include="dbo\Procedures\sp_sql_perf_mon_add_database.sql" />
-    <Build Include="dbo\Tables\sql_perf_mon_config_snapshot_type.sql" />
-    <Build Include="dbo\Tables\sql_perf_mon_master_files.sql" />
-    <Build Include="dbo\Tables\logger_disk_utilisation_database.sql" />
-    <Build Include="dbo\Procedures\usp_logger_disk_utilisation.sql" />
-    <Build Include="dbo\ufn_time_intervals.sql" />
-    <Build Include="dbo\Tables\logger_disk_utilisation_volume.sql" />
-    <Build Include="dbo\Tables\logger_missing_indexes.sql" />
-    <Build Include="dbo\Procedures\usp_logger_missing_indexes.sql" />
-    <Build Include="dbo\Tables\logger_perf_xes_waits.sql" />
-    <Build Include="dbo\Tables\logger_perf_xes_query_processing.sql" />
-    <Build Include="dbo\Tables\logger_perf_xes_iosubsystem.sql" />
+    <Build Include="dbo\Procedures\usp_sqlwatch_logger_performance.sql" />
+    <Build Include="dbo\Procedures\usp_sqlwatch_internal_retention.sql" />
+    <Build Include="dbo\Procedures\usp_sqlwatch_internal_add_database.sql" />
+    <Build Include="dbo\Tables\sqlwatch_config_snapshot_type.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_perf_master_files.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_disk_utilisation_database.sql" />
+    <Build Include="dbo\Procedures\usp_sqlwatch_logger_disk_utilisation.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_disk_utilisation_volume.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_index_missing.sql" />
+    <Build Include="dbo\Procedures\usp_sqlwatch_logger_missing_indexes.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_xes_waits_stats.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_xes_query_processing.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_xes_iosubsystem.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_perf_os_schedulers.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_xes_long_queries.sql" />
+    <Build Include="dbo\Procedures\usp_sqlwatch_logger_xes_long_queries.sql" />
+    <Build Include="dbo\Functions\ufn_sqlwatch_time_intervals.sql" />
+    <Build Include="dbo\Functions\ufn_sqlwatch_get_product_version.sql" />
+    <Build Include="dbo\Extended Events\SQLWATCH_long_queries.sql" />
+    <Build Include="dbo\Procedures\usp_sqlwatch_logger_xes_blockers.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_xes_blockers.sql" />
+    <Build Include="dbo\Procedures\usp_sqlwatch_logger_xes_diagnostics.sql" />
+    <Build Include="dbo\Functions\ufn_sqlwatch_get_xes_target_file.sql" />
+    <Build Include="dbo\Procedures\usp_sqlwatch_logger_xes_waits.sql" />
+    <Build Include="dbo\Extended Events\SQLWATCH_waits.sql" />
+    <Build Include="dbo\Procedures\usp_sqlwatch_logger_whoisactive.sql" />
+    <Build Include="dbo\Extended Events\SQLWATCH_blockers.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_index_usage_stats.sql" />
+    <Build Include="dbo\Procedures\usp_sqlwatch_logger_index_usage_stats.sql" />
+    <Build Include="dbo\Tables\sqlwatch_logger_index_usage_stats_histogram.sql" />
+    <Build Include="dbo\Tables\sqlwatch_config_sql_instance.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment1.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <ArtifactReference Include="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\Extensions\Microsoft\SQLDB\Extensions\SqlServer\100\SqlSchemas\master.dacpac">
-      <HintPath>$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\100\SqlSchemas\master.dacpac</HintPath>
-      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
-      <DatabaseVariableLiteralValue>master</DatabaseVariableLiteralValue>
-    </ArtifactReference>
-    <ArtifactReference Include="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\Extensions\Microsoft\SQLDB\Extensions\SqlServer\100\SqlSchemas\msdb.dacpac">
-      <HintPath>$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\100\SqlSchemas\msdb.dacpac</HintPath>
-      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
-      <DatabaseVariableLiteralValue>msdb</DatabaseVariableLiteralValue>
-    </ArtifactReference>
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="SQLWATCH.refactorlog" />
@@ -127,6 +135,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PreDeploy Include="Script.PreDeployment2.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <ArtifactReference Include="F:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">
+      <HintPath>$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac</HintPath>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+      <DatabaseVariableLiteralValue>master</DatabaseVariableLiteralValue>
+    </ArtifactReference>
+    <ArtifactReference Include="F:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\msdb.dacpac">
+      <HintPath>$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\msdb.dacpac</HintPath>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+      <DatabaseVariableLiteralValue>msdb</DatabaseVariableLiteralValue>
+    </ArtifactReference>
   </ItemGroup>
   <Target Name="SetDacVersionToAssemblyVersion" AfterTargets="CoreCompile">
     <GetAssemblyIdentity AssemblyFiles="$(IntermediateTargetFullFileName)">

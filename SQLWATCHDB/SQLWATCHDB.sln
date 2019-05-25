@@ -5,6 +5,11 @@ VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SQLWATCH", "SQLWATCH.sqlproj", "{DFAC46EF-72EB-4A88-96AB-F7D1A96E9E1C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7EC75DB9-2404-40FF-93F5-78BDCB414F45}"
+	ProjectSection(SolutionItems) = preProject
+		..\SQLWATCH Dashboard 2.0 Beta 4.pbix = ..\SQLWATCH Dashboard 2.0 Beta 4.pbix
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
